@@ -6,7 +6,7 @@ const API = "https://script.google.com/macros/s/AKfycbz-dkjLRjj_SZ5IoJa0a5FHhuDU
 
 const BASE_IMAGENS = "https://raw.githubusercontent.com/milaniguilherme27-cpu/acessorios-utensilios/main/img/";
 
-const TELEFONE = "5518999999999";
+const TELEFONE = "5518996926192";
 
 //=====================================================
 
