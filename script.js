@@ -36,6 +36,7 @@ async function carregarProdutos() {
         }
 
         produtos = await resposta.json();
+        preencherFiltroSecao();
 
         localStorage.setItem("catalogo", JSON.stringify(produtos));
 
@@ -150,36 +151,69 @@ function mostrar(lista) {
 
 }
 
+function preencherFiltroSecao() {
+
+    const select = document.getElementById("filtroSecao");
+
+    const secoes = [...new Set(produtos.map(p => p.SEÇÃO))];
+
+    secoes.sort();
+
+    secoes.forEach(secao => {
+
+        const option = document.createElement("option");
+
+        option.value = secao;
+
+        option.textContent = secao;
+
+        select.appendChild(option);
+
+    });
+
+}
+
 //=====================================================
 // PESQUISA
 //=====================================================
 
-document
-.getElementById("pesquisa")
-.addEventListener("input", function () {
+function aplicarFiltros() {
 
-    const texto = this.value.toLowerCase().trim();
+    const texto = document
+        .getElementById("pesquisa")
+        .value
+        .toLowerCase()
+        .trim();
 
-    if (texto === "") {
+    const secao = document
+        .getElementById("filtroSecao")
+        .value;
 
-        mostrar(produtos);
-        return;
+    const resultado = produtos.filter(prod => {
 
-    }
+        const descricao = String(prod.DESCRIÇÃO).toLowerCase();
 
-    const resultado = produtos.filter(prod =>
+        const passouPesquisa =
+            descricao.includes(texto);
 
-        String(prod.DESCRIÇÃO)
+        const passouSecao =
+            secao === "" || prod.SEÇÃO === secao;
 
-            .toLowerCase()
+        return passouPesquisa && passouSecao;
 
-            .includes(texto)
-
-    );
+    });
 
     mostrar(resultado);
 
-});
+}
+
+document
+    .getElementById("pesquisa")
+    .addEventListener("input", aplicarFiltros);
+
+document
+    .getElementById("filtroSecao")
+    .addEventListener("change", aplicarFiltros);
 
 //=====================================================
 // WHATSAPP
