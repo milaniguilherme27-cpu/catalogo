@@ -1,0 +1,274 @@
+/* ===========================
+   CONFIGURAÇÃO GERAL
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#111;
+    color:white;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+header{
+
+    background:#181818;
+
+    padding:25px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.4);
+
+}
+
+header h1{
+
+    font-size:40px;
+
+    color:white;
+
+    margin-bottom:20px;
+
+}
+
+input{
+
+    width:100%;
+
+    padding:18px;
+
+    font-size:18px;
+
+    border:none;
+
+    border-radius:12px;
+
+    outline:none;
+
+}
+
+/* ===========================
+   GRID DOS PRODUTOS
+=========================== */
+
+#produtos{
+
+    max-width:1500px;
+
+    margin:auto;
+
+    padding:30px;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+
+    gap:25px;
+
+}
+
+/* ===========================
+   CARD
+=========================== */
+
+.card{
+
+    background:#1c1c1c;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    border:1px solid #2b2b2b;
+
+    transition:.3s;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 35px rgba(255,0,0,.25);
+
+    border-color:#d60000;
+
+}
+
+/* ===========================
+   IMAGEM
+=========================== */
+
+.produto-img{
+
+    width:100%;
+
+    height:250px;
+
+    object-fit:contain;
+
+    background:white;
+
+    padding:20px;
+
+}
+
+/* ===========================
+   CONTEÚDO
+=========================== */
+
+.card-body{
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex:1;
+
+    padding:20px;
+
+}
+
+.card-body h2{
+
+    font-size:18px;
+
+    line-height:1.4;
+
+    margin-bottom:15px;
+
+    min-height:55px;
+
+}
+
+.card-body p{
+
+    color:#d7d7d7;
+
+    margin-bottom:8px;
+
+    font-size:15px;
+
+}
+
+.card-body strong{
+
+    color:white;
+
+}
+
+/* ===========================
+   PREÇO
+=========================== */
+
+.preco{
+
+    font-size:30px;
+
+    color:#ff2d2d;
+
+    font-weight:bold;
+
+    margin-top:auto;
+
+    margin-bottom:15px;
+
+}
+
+/* ===========================
+   ESTOQUE
+=========================== */
+
+.estoque{
+
+    color:#3ddc84;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+/* ===========================
+   BOTÃO
+=========================== */
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#d60000;
+
+    border:none;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+button:hover{
+
+    background:#ff2d2d;
+
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+
+@media(max-width:700px){
+
+    header h1{
+
+        font-size:28px;
+
+    }
+
+    input{
+
+        font-size:16px;
+
+    }
+
+}
+
+#filtroSecao{
+
+    width:100%;
+    padding:15px;
+    margin-top:12px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    background:#ffffff;
+    cursor:pointer;
+
+}
