@@ -1,131 +1,322 @@
 //=====================================================
-// CONFIGURAÇÕES
+// CATÁLOGO V2 - VENDA TUPY
 //=====================================================
+
+//-------------------------
+// CONFIGURAÇÕES
+//-------------------------
 
 const API = "https://script.google.com/macros/s/AKfycbz-dkjLRjj_SZ5IoJa0a5FHhuDUGiWhABw92if24ZK8Zjb0K4xl0Wos38sAYw2sBCHw/exec";
 
-const BASE_IMAGENS = "https://raw.githubusercontent.com/milaniguilherme27-cpu/catalogo/main/img/";
+const BASE_IMAGENS =
+"https://raw.githubusercontent.com/milaniguilherme27-cpu/acessorios-utensilios/main/img/";
 
 const TELEFONE = "5518996926192";
 
-//=====================================================
+const LIMITE = 24;
+
+//-------------------------
+// ESTADO DA APLICAÇÃO
+//-------------------------
+
+let pagina = 1;
+
+let paginas = 1;
+
+let carregando = false;
 
 let produtos = [];
 
+let filtros = {
+
+    busca: "",
+
+    secao: "",
+
+    ordenar: "descricao",
+
+    estoque: "",
+
+    marca: ""
+
+};
+
 //=====================================================
-// CARREGA PRODUTOS
+// INICIALIZAÇÃO
 //=====================================================
 
-async function carregarProdutos() {
+window.addEventListener("DOMContentLoaded", iniciar);
 
-    try {
+async function iniciar(){
 
-        const cache = localStorage.getItem("catalogo");
+    await carregarSecoes();
 
-        if (cache) {
+    await carregarProdutos(true);
 
-            produtos = JSON.parse(cache);
-            mostrar(produtos);
+}
 
-        }
+//=====================================================
+// CARREGAR PRODUTOS
+//=====================================================
 
-        const resposta = await fetch(API);
+async function carregarProdutos(reiniciar=false){
 
-        if (!resposta.ok) {
-            throw new Error("Erro ao acessar API.");
-        }
+    if(carregando) return;
 
-        produtos = await resposta.json();
-        preencherFiltroSecao();
+    carregando = true;
 
-        localStorage.setItem("catalogo", JSON.stringify(produtos));
+    if(reiniciar){
 
-        mostrar(produtos);
+        pagina = 1;
 
-    } catch (erro) {
+        produtos = [];
 
-        console.error("Erro:", erro);
+        document.getElementById("produtos").innerHTML="";
+
+    }
+
+    const params = new URLSearchParams({
+
+        pagina:pagina,
+
+        limite:LIMITE,
+
+        catalogo:"SIM",
+
+        busca:filtros.busca,
+
+        secao:filtros.secao,
+
+        ordenar:filtros.ordenar,
+
+        estoque:filtros.estoque,
+
+        marca:filtros.marca
+
+    });
+
+    try{
+
+        const resposta = await fetch(API + "?" + params);
+
+        const dados = await resposta.json();
+
+        paginas = dados.paginas;
+
+        produtos = produtos.concat(dados.produtos);
+
+        mostrarProdutos(dados.produtos);
+
+        atualizarBotaoMais();
+
+    }
+
+    catch(erro){
+
+        console.error(erro);
+
+    }
+
+    carregando=false;
+
+}
+
+//=====================================================
+// CARREGAR SEÇÕES
+//=====================================================
+
+
+async function carregarSecoes(){
+
+    try{
+
+        const resposta = await fetch(API + "?acao=secoes");
+
+        const secoes = await resposta.json();
+
+        const select = document.getElementById("filtroSecao");
+
+        select.innerHTML =
+            '<option value="">📂 Todas as seções</option>';
+
+        secoes.forEach(sec=>{
+
+            const option=document.createElement("option");
+
+            option.value=sec;
+
+            option.textContent=sec;
+
+            select.appendChild(option);
+
+        });
+
+    }
+
+    catch(erro){
+
+        console.error(erro);
 
     }
 
 }
 
-carregarProdutos();
+
 
 //=====================================================
-// MOSTRAR PRODUTOS
+// CARREGAR MAIS
 //=====================================================
 
-function mostrar(lista) {
+function carregarMais(){
+
+    if(pagina>=paginas) return;
+
+    pagina++;
+
+    carregarProdutos();
+
+}
+
+//=====================================================
+// BOTÃO "CARREGAR MAIS"
+//=====================================================
+
+function atualizarBotaoMais(){
+
+    let botao=document.getElementById("mais");
+
+    if(!botao){
+
+        botao=document.createElement("button");
+
+        botao.id="mais";
+
+        botao.innerHTML="Carregar mais produtos";
+
+        botao.onclick=carregarMais;
+
+        document.querySelector("main").appendChild(botao);
+
+    }
+
+    botao.style.display=
+
+        pagina>=paginas
+
+        ?"none"
+
+        :"block";
+
+}
+
+//=====================================================
+// RENDERIZAÇÃO DOS PRODUTOS
+//=====================================================
+
+function mostrarProdutos(lista){
 
     const container = document.getElementById("produtos");
 
     let html = "";
 
-    lista.forEach(prod => {
+    lista.forEach(prod=>{
 
-        //------------------------------------------------
+        //-------------------------------------------------
         // PREÇO
-        //------------------------------------------------
+        //-------------------------------------------------
 
         let preco = "";
 
-        if (prod["PREÇO"] != null && !isNaN(prod["PREÇO"])) {
+        const valor = Number(
+            String(prod["PREÇO"])
+                .replace(",",".")
+        );
 
-            preco = Number(prod["PREÇO"]).toLocaleString("pt-BR", {
+        if(!isNaN(valor)){
 
-                style: "currency",
+            preco = valor.toLocaleString("pt-BR",{
 
-                currency: "BRL"
+                style:"currency",
+
+                currency:"BRL"
 
             });
 
         }
 
-        //------------------------------------------------
+        //-------------------------------------------------
         // IMAGEM
-        //------------------------------------------------
+        //-------------------------------------------------
 
-        const imagem = prod.IMAGEM
+        let imagem="";
 
-            ? BASE_IMAGENS + prod.IMAGEM
+        if(prod.IMAGEM){
 
-            : "https://via.placeholder.com/400x400?text=Sem+Imagem";
+            imagem = BASE_IMAGENS + encodeURIComponent(prod.IMAGEM);
 
-        //------------------------------------------------
+        }else{
+
+            imagem =
+            "https://via.placeholder.com/400x400?text=Sem+Imagem";
+
+        }
+
+        //-------------------------------------------------
         // ESTOQUE
-        //------------------------------------------------
+        //-------------------------------------------------
 
         const estoque = Number(prod.ESTOQUE);
 
-        const estoqueTexto = estoque > 0
+        let textoEstoque="";
 
-            ? `<span style="color:#3ddc84;font-weight:bold;">Em estoque: ${estoque}</span>`
+        let classeEstoque="";
 
-            : `<span style="color:#ff4444;font-weight:bold;">Esgotado</span>`;
+        if(estoque>0){
 
-        //------------------------------------------------
+            textoEstoque="Em estoque";
+
+            classeEstoque="estoque-ok";
+
+        }else{
+
+            textoEstoque="Produto indisponível";
+
+            classeEstoque="estoque-zero";
+
+        }
+
+        //-------------------------------------------------
         // CARD
-        //------------------------------------------------
+        //-------------------------------------------------
 
-        html += `
+        html+=`
 
         <div class="card">
 
             <img
-                loading="lazy"
                 class="produto-img"
+                loading="lazy"
                 src="${imagem}"
                 alt="${prod.DESCRIÇÃO}"
-                onerror="this.src='https://via.placeholder.com/400x400?text=Sem+Imagem'">
+            >
 
             <div class="card-body">
 
                 <h2>${prod.DESCRIÇÃO}</h2>
 
-                <p><strong>Categoria:</strong> ${prod.SEÇÃO}</p>
+                <p>
 
-                <p>${estoqueTexto}</p>
+                    <strong>Categoria:</strong>
+
+                    ${prod.SEÇÃO}
+
+                </p>
+
+                <p class="${classeEstoque}">
+
+                    ${textoEstoque}
+
+                </p>
 
                 <div class="preco">
 
@@ -133,7 +324,10 @@ function mostrar(lista) {
 
                 </div>
 
-                <button onclick="comprar('${prod.DESCRIÇÃO}')">
+                <button
+                    onclick="comprar('${prod.DESCRIÇÃO}')"
+                    ${estoque==0?"disabled":""}
+                >
 
                     Comprar pelo WhatsApp
 
@@ -147,29 +341,33 @@ function mostrar(lista) {
 
     });
 
-    container.innerHTML = html;
+    container.insertAdjacentHTML("beforeend",html);
 
 }
 
-function preencherFiltroSecao() {
+//=====================================================
+// LIMPAR PRODUTOS
+//=====================================================
 
-    const select = document.getElementById("filtroSecao");
+function limparProdutos(){
 
-    const secoes = [...new Set(produtos.map(p => p.SEÇÃO))];
+    document.getElementById("produtos").innerHTML="";
 
-    secoes.sort();
+}
 
-    secoes.forEach(secao => {
+//=====================================================
+// RECARREGAR CATÁLOGO
+//=====================================================
 
-        const option = document.createElement("option");
+function atualizarCatalogo(){
 
-        option.value = secao;
+    pagina=1;
 
-        option.textContent = secao;
+    produtos=[];
 
-        select.appendChild(option);
+    limparProdutos();
 
-    });
+    carregarProdutos(true);
 
 }
 
@@ -177,60 +375,122 @@ function preencherFiltroSecao() {
 // PESQUISA
 //=====================================================
 
-function aplicarFiltros() {
-
-    const texto = document
-        .getElementById("pesquisa")
-        .value
-        .toLowerCase()
-        .trim();
-
-    const secao = document
-        .getElementById("filtroSecao")
-        .value;
-
-    const resultado = produtos.filter(prod => {
-
-        const descricao = String(prod.DESCRIÇÃO).toLowerCase();
-
-        const passouPesquisa =
-            descricao.includes(texto);
-
-        const passouSecao =
-            secao === "" || prod.SEÇÃO === secao;
-
-        return passouPesquisa && passouSecao;
-
-    });
-
-    mostrar(resultado);
-
-}
+let timerPesquisa = null;
 
 document
     .getElementById("pesquisa")
-    .addEventListener("input", aplicarFiltros);
+    .addEventListener("input", function(){
+
+        clearTimeout(timerPesquisa);
+
+        timerPesquisa = setTimeout(() => {
+
+            filtros.busca = this.value.trim();
+
+            atualizarCatalogo();
+
+        },300);
+
+    });
+
+//=====================================================
+// FILTRO POR SEÇÃO
+//=====================================================
 
 document
     .getElementById("filtroSecao")
-    .addEventListener("change", aplicarFiltros);
+    .addEventListener("change", function(){
+
+        filtros.secao = this.value;
+
+        atualizarCatalogo();
+
+    });
 
 //=====================================================
 // WHATSAPP
 //=====================================================
 
-function comprar(produto) {
+function comprar(produto){
 
     const mensagem =
-`Olá! Tenho interesse no produto:
+`Olá!
 
-${produto}
+Tenho interesse no produto:
+
+*${produto}*
 
 Vi este produto no catálogo da Venda Tupy.`;
 
     const url =
 `https://wa.me/${TELEFONE}?text=${encodeURIComponent(mensagem)}`;
 
-    window.open(url, "_blank");
+    window.open(url,"_blank");
 
 }
+
+//=====================================================
+// UTILITÁRIOS
+//=====================================================
+
+function formatarPreco(valor){
+
+    valor = Number(
+        String(valor)
+            .replace(",",".")
+    );
+
+    if(isNaN(valor))
+        return "";
+
+    return valor.toLocaleString("pt-BR",{
+
+        style:"currency",
+
+        currency:"BRL"
+
+    });
+
+}
+
+//=====================================================
+// SCROLL INFINITO
+//=====================================================
+
+window.addEventListener("scroll",()=>{
+
+    if(carregando)
+        return;
+
+    if(pagina>=paginas)
+        return;
+
+    const fimPagina =
+        window.innerHeight + window.scrollY;
+
+    const alturaDocumento =
+        document.body.offsetHeight;
+
+    if(fimPagina >= alturaDocumento-500){
+
+        carregarMais();
+
+    }
+
+});
+
+//=====================================================
+// TRATAMENTO DE ERROS
+//=====================================================
+
+window.addEventListener("error",function(e){
+
+    console.error("Erro:",e.message);
+
+});
+
+//=====================================================
+// LOG
+//=====================================================
+
+console.log("Venda Tupy V2 carregado.");
