@@ -17,25 +17,78 @@
 
 <header>
 
-    <h1>Venda Tupy</h1>
+    <div class="header-top">
 
-    <input
-        type="text"
-        id="pesquisa"
-        placeholder="🔍 Pesquisar produto...">
+        <h1>Venda Tupy</h1>
 
+    </div>
 
-    <select id="filtroSecao">
-        <option value="">Todas as seções</option>
-    </select>
+    <div class="barra-pesquisa">
+
+        <input
+            type="text"
+            id="pesquisa"
+            placeholder="🔍 Pesquisar produto...">
+
+    </div>
+
+    <div class="filtros">
+
+        <select id="filtroSecao">
+            <option value="">📂 Todas as seções</option>
+        </select>
+
+        <select id="ordenacao">
+
+            <option value="descricao">
+                🔤 Nome (A-Z)
+            </option>
+
+            <option value="preco">
+                💲 Menor preço
+            </option>
+
+            <option value="estoque">
+                📦 Maior estoque
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="informacoes">
+
+        <span id="contador">
+
+            Carregando produtos...
+
+        </span>
+
+    </div>
 
 </header>
 
 <main>
 
+    <div id="loading">
+
+        Carregando produtos...
+
+    </div>
+
     <div id="produtos"></div>
 
 </main>
+
+<footer>
+
+    <p>
+
+        © Venda Tupy
+
+    </p>
+
+</footer>
 
 <script src="script.js"></script>
 
