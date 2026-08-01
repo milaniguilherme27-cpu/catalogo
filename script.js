@@ -9,7 +9,7 @@
 const API = "https://script.google.com/macros/s/AKfycbz-dkjLRjj_SZ5IoJa0a5FHhuDUGiWhABw92if24ZK8Zjb0K4xl0Wos38sAYw2sBCHw/exec";
 
 const BASE_IMAGENS =
-"https://raw.githubusercontent.com/milaniguilherme27-cpu/acessorios-utensilios/main/img/";
+"https://raw.githubusercontent.com/milaniguilherme27-cpu/catalogo/main/img/";
 
 const TELEFONE = "5518996926192";
 
